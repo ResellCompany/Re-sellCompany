@@ -11,14 +11,17 @@ router.get('/register', (req, res) => {
 // 상품 등록 처리
 router.post('/register', (req, res) => {
     const { name, price, image_url, on_sale, original_price } = req.body;
-    const salePrice = on_sale === 'true' ? original_price : null;
+
+    const finalOriginalPrice = original_price ? original_price : null;
+
+    const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
 
     const conn = db_connect.getConnection();
 
-    conn.query(db_sql.products_insert, [name, price, image_url, on_sale === 'true', original_price, salePrice], function (e, result) {
+    conn.query(db_sql.products_insert, [name, price, image_url, on_sale === 'true', finalOriginalPrice, salePrice], function (e, result) {
         try {
             if (e) {
-                console.log('Insert Error');
+                console.log('Insert Error:', e);
                 throw e;
             } else {
                 res.redirect('/');
@@ -31,5 +34,6 @@ router.post('/register', (req, res) => {
         }
     });
 });
+
 
 module.exports = router;
