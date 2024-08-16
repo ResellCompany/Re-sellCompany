@@ -57,7 +57,10 @@ app.get('/', (req, res) => {
     });
 });
 
-//goto.go(req,res,undefined);
+
+const item = require('./routes/item');
+app.use('/item', item);
+
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
