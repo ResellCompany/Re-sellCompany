@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>물건 상세 정보</title>
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container" style="margin-top:30px">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>{{ product.name }}</h2>
+                <img src="{{ product.image_url }}" class="img-fluid" alt="{{ product.name }}">
+                <p class="mt-4">{{ product.description }}</p>
+                <h4>
+                    {% if product.on_sale %}
+                    <span class="text-muted text-decoration-line-through">${{ product.original_price }}</span>
+                    ${{ product.sale_price }}
+                    {% else %}
+                    ${{ product.price }}
+                    {% endif %}
+                </h4>
+                <a href="/cart/borrow/{{ product.id }}" class="btn btn-primary">이 물건 빌리기</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

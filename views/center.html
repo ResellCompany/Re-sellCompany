@@ -13,8 +13,7 @@
                         <div class="text-center">
                             <h5 class="fw-bolder">{{ product.name }}</h5>
                             {% if product.on_sale %}
-                            <span class="text-muted text-decoration-line-through">${{ product.original_price
-                                }}</span>
+                            <span class="text-muted text-decoration-line-through">${{ product.original_price }}</span>
                             ${{ product.sale_price }}
                             {% else %}
                             ${{ product.price }}
@@ -22,7 +21,8 @@
                         </div>
                     </div>
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">물건 빌리기</a>
+                        <div class="text-center">
+                            <a class="btn btn-outline-dark mt-auto" href="/cart/details/{{ product.id }}">물건 빌리기</a>
                         </div>
                     </div>
                 </div>
