@@ -84,6 +84,10 @@ app.post('/login', passport.authenticate("local", {
 app.get('/loginerror', (req, res) => {
     goto.go(req, res, { centerpage: 'loginerror' });
 });
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+})
 
 // 메인 페이지 라우터
 app.get('/', (req, res) => {
@@ -102,22 +106,54 @@ app.get('/login', (req, res) => goto.go(req, res, { centerpage: 'login' }));
 app.get('/register', (req, res) => goto.go(req, res, { centerpage: 'register' }));
 app.get('/about', (req, res) => goto.go(req, res, { centerpage: 'about' }));
 
+
 // 회원가입 처리 라우터
 app.post('/registerimpl', (req, res) => {
-    const { id, pwd, name, acc } = req.body;
+    // 요청으로부터 필요한 데이터를 추출
+    let id = req.body.id;
+    let pwd = req.body.pwd;
+    let name = req.body.name;
+    let acc = req.body.acc;
+
+    // 입력받은 데이터 확인을 위한 로그 출력
+    console.log(`${id} ${pwd} ${name} ${acc}`);
+
+    // 데이터베이스 연결
     const conn = db_connect.getConnection();
-    conn.query(db_sql.cust_insert, [id, pwd, name, acc], (e) => {
-        if (e) {
-            console.log('Insert Error:', e);
+    let values = [id, pwd, name, acc];
+
+    // 쿼리 실행
+    conn.query(db_sql.cust_insert, values, (e, result, fields) => {
+        try {
+            if (e) {
+                console.log('Insert Error');
+                throw e; // 에러 발생 시 예외를 던져 catch 블록으로 이동
+            } else {
+                console.log('Insert OK!');
+                // 회원가입 성공 페이지로 이동
+                return goto.go(req, res, { centerpage: 'registerok' });
+            }
+        } catch (e) {
+            // 에러 발생 시 실패 페이지로 이동
+            console.log(e);
             return goto.go(req, res, { centerpage: 'registerfail' });
+        } finally {
+            // 데이터베이스 연결 닫기
+            db_connect.close(conn);
         }
-        res.redirect('/');
     });
 });
 
 // 아이템 관련 라우터
 app.use('/item', item);
 app.use('/cart', cart);
+
+//관리자 모드 
+const admin = require('./routes/admin');
+app.use('/admin', admin);
+// 박주민_회원정보변경 (cust)
+const cust = require('./routes/cust');
+app.use('/cust', cust);
 // 서버 실행
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
