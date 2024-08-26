@@ -147,10 +147,12 @@ app.post('/registerimpl', (req, res) => {
 // 아이템 관련 라우터
 app.use('/item', item);
 app.use('/cart', cart);
+app.use('/products', item);
+
 
 //관리자 모드 
 const admin = require('./routes/admin');
-app.use('/admin', admin);
+app.use('/admin', admin)
 // 박주민_회원정보변경 (cust)
 const cust = require('./routes/cust');
 app.use('/cust', cust);

@@ -18,6 +18,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+
 // 상품 등록 페이지 렌더링
 router.get('/register', (req, res) => {
     goto.go(req, res, { 'centerpage': 'item/register' });
@@ -53,6 +55,10 @@ router.post('/register', upload.single('image'), (req, res) => {
             db_connect.close(conn);
         }
     });
+
+    
 });
+
+
 
 module.exports = router;

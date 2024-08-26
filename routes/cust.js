@@ -89,12 +89,11 @@ router
         });
     })
     .get('/deleteimpl', (req, res) => {
-        let id = req.body.id;
+        let id = req.query.id; // GET 요청에서는 req.query 사용
         let values = [id];
-
-
+    
         conn = db_connect.getConnection();
-
+    
         conn.query(db_sql.cust_delete, values, function (e, result, fields) {
             try {
                 if (e) {
@@ -103,7 +102,6 @@ router
                 } else {
                     console.log('result');
                     res.redirect('/cust/cust1'); // 리디렉션 수정
-
                 }
             } catch (e) {
                 goto.go(req, res, { 'centerpage': 'cust/detailfail' }); // 'index'와 'cust/detailfail' 수정
@@ -112,7 +110,7 @@ router
                 db_connect.close(conn);
             }
         });
-    })
-
+    });
+    
 
 module.exports = router;
