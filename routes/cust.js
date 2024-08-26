@@ -11,10 +11,10 @@ var db_sql = require('../db/db_sql');
 
 // /block
 router
+    // .get('/', (req, res) => {
+    //     goto.go(req, res, { 'centerpage': 'cust/center' });
+    // })
     .get('/', (req, res) => {
-        goto.go(req, res, { 'centerpage': 'cust/center' });
-    })
-    .get('/cust1', (req, res) => {
         conn = db_connect.getConnection();
         //'SELECT * FROM cust',
         conn.query(db_sql.cust_select, function (err, result, fields) {
@@ -101,7 +101,7 @@ router
                     throw e;
                 } else {
                     console.log('result');
-                    res.redirect('/cust/cust1'); // 리디렉션 수정
+                    res.redirect('/cust/'); // 리디렉션 수정
                 }
             } catch (e) {
                 goto.go(req, res, { 'centerpage': 'cust/detailfail' }); // 'index'와 'cust/detailfail' 수정
