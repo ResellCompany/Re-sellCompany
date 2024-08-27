@@ -106,7 +106,6 @@ app.get('/login', (req, res) => goto.go(req, res, { centerpage: 'login' }));
 app.get('/register', (req, res) => goto.go(req, res, { centerpage: 'register' }));
 app.get('/about', (req, res) => goto.go(req, res, { centerpage: 'about' }));
 
-
 // 회원가입 처리 라우터
 app.post('/registerimpl', (req, res) => {
     // 요청으로부터 필요한 데이터를 추출

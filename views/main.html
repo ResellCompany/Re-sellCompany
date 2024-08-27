@@ -1,83 +1,85 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="물건을 공유하고 빌릴 수 있는 서비스" />
     <meta name="author" content="Your Company" />
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7a195ee5d3a7623470f5a133f4166f68"></script>
+    <!-- Kakao Map API 키 변경 필요 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7a195ee5d3a7623470f5a133f4166f68&libraries=services"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Share and Borrow - 물건 공유 서비스</title>
-    <!-- 여기부터 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7a195ee5d3a7623470f5a133f4166f68"></script>
-    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Custom styles -->
+    <link href="/css/styles.css" rel="stylesheet" />
+    <!-- Highcharts -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
-    <!-- 여기까지 -->
-    <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <!-- Bootstrap icons-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="/css/styles.css" rel="stylesheet" />
-
     <style>
         /* 네비게이션 바 버튼 스타일 */
         .navbar .nav-link {
-            font-size: 16px; /* 버튼 텍스트 크기 조정 */
-            padding: 10px 20px; /* 버튼 패딩 조정 */
-            border-radius: 5px; /* 버튼 모서리 둥글기 조정 */
-            transition: background-color 0.3s, color 0.3s; /* 버튼 효과 애니메이션 */
-            white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 */
-            overflow: hidden; /* 오버플로우 텍스트 숨김 */
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
         }
+
         .navbar .nav-link:hover {
-            background-color: #f8f9fa; /* 호버 시 배경색 변경 */
-            color: #007bff; /* 호버 시 텍스트 색상 변경 */
+            background-color: #f8f9fa;
+            color: #007bff;
         }
+
         .navbar .btn {
-            font-size: 16px; /* 버튼 텍스트 크기 조정 */
-            padding: 10px 20px; /* 버튼 패딩 조정 */
-            border-radius: 5px; /* 버튼 모서리 둥글기 조정 */
-            transition: background-color 0.3s, color 0.3s; /* 버튼 효과 애니메이션 */
-            white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 */
-            overflow: hidden; /* 오버플로우 텍스트 숨김 */
-            width: auto; /* 버튼 너비를 자동으로 조정 */
-            text-align: center; /* 텍스트 중앙 정렬 */
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            width: auto;
+            text-align: center;
         }
+
         .navbar .btn-outline-dark {
-            border-color: #343a40; /* 버튼 테두리 색상 조정 */
-            color: #343a40; /* 버튼 텍스트 색상 조정 */
+            border-color: #343a40;
+            color: #343a40;
         }
+
         .navbar .btn-outline-dark:hover {
-            background-color: #343a40; /* 호버 시 배경색 변경 */
-            color: #ffffff; /* 호버 시 텍스트 색상 변경 */
+            background-color: #343a40;
+            color: #ffffff;
         }
+
         .navbar .btn-primary {
-            background-color: #007bff; /* 기본 버튼 배경색 */
-            border-color: #007bff; /* 버튼 테두리 색상 */
+            background-color: #007bff;
+            border-color: #007bff;
         }
+
         .navbar .btn-primary:hover {
-            background-color: #0056b3; /* 호버 시 배경색 변경 */
-            border-color: #004085; /* 호버 시 테두리 색상 변경 */
+            background-color: #0056b3;
+            border-color: #004085;
         }
 
         /* 오른쪽으로 버튼을 더 치우치게 하는 스타일 */
         .navbar .d-flex {
-            margin-right: 1rem; /* 오른쪽 여백 추가 */
+            margin-right: 1rem;
         }
+
         .navbar .d-flex .btn {
-            margin-left: 0.5rem; /* 버튼 간격 조정 */
+            margin-left: 0.5rem;
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -95,26 +97,22 @@
                             data-bs-toggle="dropdown" aria-expanded="false">Browse</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/items/all">All Items</a></li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
+                            <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="/items/popular">Popular Items</a></li>
                             <li><a class="dropdown-item" href="/items/new">New Arrivals</a></li>
                         </ul>
                     </li>
                     {% if loginid and loginid != 'admin' %}
                     <li class="nav-item">
-                      <a class="nav-link" href="/useritem/cart">찜한 상품</a>
+                        <a class="nav-link" href="/cart/cart">찜한 상품</a>
                     </li>
                     {% endif %}
                     {% if loginid == 'admin' %}
                     <li class="nav-item">
-                      <a class="nav-link" href="/cust">Cust Mgt</a></li>
+                        <a class="nav-link" href="/cust">Cust Mgt</a>
+                    </li>   
                     <li class="nav-item">
-                      <a class="nav-link" href="/admin">Cart Mgt</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/item">Item Mgt</a>
+                        <a class="nav-link" href="/item">Item Mgt</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -123,7 +121,7 @@
                     <!-- loginid가 있을 때 표시 -->
                     <a class="btn btn-outline-dark me-2" href="/cust/detail?id={{loginid}}">{{loginid}} 님 접속</a>
                     <a class="btn btn-outline-dark me-2" href="/logout">Logout</a>
-                    <a class="btn btn-outline-dark me-2" href="/cart"> 빌린 물건</a>
+                    <a class="btn btn-outline-dark me-2" href="/cart/cart"> 빌린 물건</a>
                     <a class="btn btn-primary me-2" href="/item/register">공유 물건 등록하기</a>
                     {% else %}
                     <!-- loginid가 없을 때 표시 -->
@@ -134,9 +132,6 @@
             </div>
         </div>
     </nav>
-    <!-- 나머지 코드 -->
-</body>
-</html>
 
     <!-- Header -->
     <header class="bg-dark py-5">
@@ -147,6 +142,7 @@
             </div>
         </div>
     </header>
+
     <!-- Section -->
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
@@ -158,14 +154,16 @@
             {% endif %}
         </div>
     </section>
+
     <!-- Footer -->
     <footer class="py-5 bg-dark">
         <div class="container">
             <p class="m-0 text-center text-white">Copyright &copy; Re-sell Company 2024</p>
         </div>
     </footer>
+
     <!-- Bootstrap core JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS -->
     <script src="js/scripts.js"></script>
 </body>
