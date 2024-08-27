@@ -101,9 +101,7 @@
                             data-bs-toggle="dropdown" aria-expanded="false">Browse</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/items/all">All Items</a></li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
+                            <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="/items/popular">Popular Items</a></li>
                             <li><a class="dropdown-item" href="/items/new">New Arrivals</a></li>
                         </ul>
@@ -116,10 +114,7 @@
                     {% if loginid == 'admin' %}
                     <li class="nav-item">
                         <a class="nav-link" href="/cust">Cust Mgt</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Cart Mgt</a>
-                    </li>
+                    </li>   
                     <li class="nav-item">
                         <a class="nav-link" href="/item">Item Mgt</a>
                     </li>
@@ -130,7 +125,7 @@
                     <!-- loginid가 있을 때 표시 -->
                     <a class="btn btn-outline-dark me-2" href="/cust/detail?id={{loginid}}">{{loginid}} 님 접속</a>
                     <a class="btn btn-outline-dark me-2" href="/logout">Logout</a>
-                    <a class="btn btn-outline-dark me-2" href="/cart"> 빌린 물건</a>
+                    <a class="btn btn-outline-dark me-2" href="/cart/cart"> 빌린 물건</a>
                     <a class="btn btn-primary me-2" href="/item/register">공유 물건 등록하기</a>
                     {% else %}
                     <!-- loginid가 없을 때 표시 -->
@@ -151,6 +146,7 @@
             </div>
         </div>
     </header>
+
     <!-- Section -->
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
@@ -162,12 +158,14 @@
             {% endif %}
         </div>
     </section>
+
     <!-- Footer -->
     <footer class="py-5 bg-dark">
         <div class="container">
             <p class="m-0 text-center text-white">Copyright &copy; Re-sell Company 2024</p>
         </div>
     </footer>
+
     <!-- Bootstrap core JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS -->

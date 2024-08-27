@@ -1,77 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table Example</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* CSS 스타일 추가 */
-        .table thead th {
-            background-color: black;
-            color: white;
-        }
-
-        #item_img {
-            width: 80px;
-            height: 80px;
-        }
-    </style>
+    <title>Item List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
     <div class="container" style="margin-top:30px">
         <div class="row">
-            <!-- Navigation items -->
-            <div class="col-sm-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/item/item1">item1</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/item/item2">item2</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/item/item3">item3</a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Table section -->
-            <div class="col-sm-9">
+            <div class="col-sm-12">
+                <h2>Item List</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Image</th>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Price</th>
-                            <th>RegDate</th>
-                            <th>Action</th>
+                            <th>Sale Price</th>
+                            <th>Original Price</th>
+                            <th>Image URL</th>
+                            <th>On Sale</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in items %}
-                        <tr>
-                            <td><img src="/img/{{ i.imgname }}" id="item_img" alt="Item Image"></td>
-                            <td><a href="/item/detail?id={{i.id}}">{{ i.id }}</a></td>
-                            <td>{{ i.name }}</td>
-                            <td>{{ i.price }}</td>
-                            <td>{{ i.regdate }}</td>
+                        {% for item in items %}
+                        <tr>  
+                            <td><a href ='/item/detail?id={{item.id}}'>{{ item.id }}</a></td>
+                            <td>{{ item.name }}</td>
+                            <td>${{ item.price }}</td>
+                            <td>${{ item.sale_price if item.sale_price is not none else 'N/A' }}</td>
+                            <td>${{ item.original_price if item.original_price is not none else 'N/A' }}</td>
                             <td>
-                                <form action="/admin/delete2/{{i.id}}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
+                                {% if item.image_url %}
+                                    <img src="{{ item.image_url }}" alt="Image" style="width:100px;height:auto;">
+                                {% else %}
+                                    No Image
+                                {% endif %}
                             </td>
+                            <td>{{ 'Yes' if item.on_sale else 'No' }}</td>
+                            <td>{{ item.latitude if item.latitude is not none else 'N/A' }}</td>
+                            <td>{{ item.longitude if item.longitude is not none else 'N/A' }}</td>
+                            <td>{{ item.user_id if item.user_id is not none else 'N/A' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <h2>item1 html 페이지 입니다</h2>
             </div>
         </div>
     </div>
-</body>
 
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
+
+
+
+

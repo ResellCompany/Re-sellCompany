@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Detail Page</title>
+    <!-- Bootstrap CSS for styling -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Item Detail Page</h2>
+                <form action="/item/updateimpl" method="POST">
+                    <div class="form-group">
+                        <label for="id">ID:</label>
+                        <input type="text" value="{{item.id}}" readonly class="form-control" name="id" id="id">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" value="{{item.name}}" class="form-control" name="name" id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price:</label>
+                        <input type="text" value="{{item.price}}" class="form-control" name="price" id="price">
+                    </div>
+                    <div class="form-group">
+                        <label for="image_url">Image URL:</label>
+                        <input type="text" value="{{item.image_url}}" class="form-control" name="image_url" id="image_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="sale_price">Sale Price:</label>
+                        <input type="text" value="{{item.sale_price}}" class="form-control" name="sale_price" id="sale_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="original_price">Original Price:</label>
+                        <input type="text" value="{{item.original_price}}" class="form-control" name="original_price" id="original_price">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="on_sale" name="on_sale" {% if item.on_sale %} checked {% endif %}>
+                        <label class="form-check-label" for="on_sale">On Sale</label>
+                    </div>
+                    <div class="form-group d-flex">
+                        <button type="submit" class="btn btn-primary me-2">Update</button>
+                        {% if loginid != null %}
+                        <!-- loginid가 'not null'인 경우에만 삭제 버튼 표시 -->
+                        <a href="/item/deleteimpl?id={{item.id}}" class="btn btn-danger" role="button">Delete</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,19 +1,24 @@
 module.exports = {
+    // 상품 테이블
     products_select:'SELECT * FROM products',
     products_insert: 'INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price) VALUES (?, ?, ?, ?, ?, ?)',
     product_select_one: 'SELECT * FROM products WHERE id = ?',
+    products_delete: 'DELETE FROM products WHERE id = ?',
     
-    
-    cart_select: 'SELECT * FROM cart',
-    cart_select_one: 'SELECT id, product_id, product_name, product_price, quantity, total_price, date_format(regdate, "%Y년%m월%d일 %H:%i:%s") as regdate FROM cart WHERE userid = ?',
-    cart_insert: 'INSERT INTO cart (product_id, product_name, product_price, quantity, total_price, regdate) VALUES (?, ?, ?, ?, ?, SYSDATE())',
-    cart_delete: 'DELETE FROM cart WHERE id = ?',
+    products_insert: 'INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price, latitude, longitude, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    products_select_one: 'SELECT * FROM products WHERE id = ?',
 
+   // 찜하기 (장바구니) 테이블
+   cart_select: 'SELECT * FROM cart',
+   cart_select_user: 'SELECT p.id, p.name, p.price, c.added_at FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?',
+   cart_insert: 'INSERT INTO cart (user_id, product_id) VALUES (?, ?)',
+   cart_delete: 'DELETE FROM cart WHERE user_id = ? AND product_id = ?',
 
-    cust_select_not_admin : `SELECT * FROM cust WHERE id != 'admin'`,
-    cust_select: 'SELECT * FROM cust',
-    cust_select_one: 'SELECT * FROM cust WHERE id = ?',
-    cust_insert: 'INSERT INTO cust VALUES (?,?,?,?)',
-    cust_update: 'UPDATE cust SET pwd=?, name=?, acc=? WHERE id=?',
-    cust_delete: 'DELETE FROM cust WHERE id = ?',
+   // 회원 테이블
+   cust_select_not_admin: 'SELECT * FROM cust WHERE id != \'admin\'',
+   cust_select: 'SELECT * FROM cust',
+   cust_select_one: 'SELECT * FROM cust WHERE id = ?',
+   cust_insert: 'INSERT INTO cust VALUES (?,?,?,?)',
+   cust_update: 'UPDATE cust SET pwd=?, name=?, acc=? WHERE id=?',
+   cust_delete: 'DELETE FROM cust WHERE id = ?',
 };
