@@ -22,7 +22,6 @@ router
             db_connect.close(conn);
         });
     })
-
     .post('/delete/:id', (req, res) => {
         const cartId = req.params.id;
         const conn = db_connect.getConnection();

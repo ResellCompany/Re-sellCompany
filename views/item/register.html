@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신규 상품 등록</title>
+    <!-- 부트스트랩 CSS 추가 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-4">신규 상품 등록</h1>
-        <!-- enctype 속성을 추가 -->
-        <form action="/item/register" method="POST" enctype="multipart/form-data">
+        <form action="/item/register" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
             <div class="mb-3">
                 <label for="productName" class="form-label">상품명</label>
                 <input type="text" class="form-control" id="productName" name="name" required>
@@ -16,23 +23,101 @@
             </div>
             <div class="mb-3">
                 <label for="productImage" class="form-label">이미지 파일</label>
-                <!-- 파일 업로드 필드 추가 -->
                 <input type="file" class="form-control" id="productImage" name="image" accept="image/*" required>
             </div>
             <div class="mb-3">
                 <label for="productOnSale" class="form-label">세일 여부</label>
-                <select class="form-select" id="productOnSale" name="on_sale">
+                <select class="form-select" id="productOnSale" name="on_sale" onchange="toggleOriginalPrice()">
                     <option value="false" selected>아니오</option>
                     <option value="true">예</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="productOriginalPrice" class="form-label">원래 가격 (세일 중일 경우)</label>
-                <input type="number" class="form-control" id="productOriginalPrice" name="original_price">
+                <input type="number" class="form-control" id="productOriginalPrice" name="original_price" disabled>
             </div>
+            <div class="mb-3">
+                <label for="productLocation" class="form-label">위치 검색</label>
+                <input type="text" class="form-control" id="productLocation" placeholder="주소를 입력하세요">
+                <button type="button" class="btn btn-secondary mt-2" onclick="searchLocation()">검색하기</button>
+            </div>
+            <div id="map" style="width:100%;height:350px;"></div>
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
             <button type="submit" class="btn btn-primary">등록</button>
         </form>
     </div>
+
+    <script>
+        // 함수들을 전역에서 사용할 수 있도록 정의
+        let map, geocoder, marker;
+
+        function initKakaoMap() {
+            var mapContainer = document.getElementById('map');
+            var mapOption = {
+                center: new kakao.maps.LatLng(37.566535, 126.97796919999996), // 초기 중심 좌표
+                level: 3
+            };
+            map = new kakao.maps.Map(mapContainer, mapOption);
+            geocoder = new kakao.maps.services.Geocoder();
+            marker = new kakao.maps.Marker();
+        }
+
+        function searchLocation() {
+            var address = document.getElementById('productLocation').value;
+            if (address) {
+                geocoder.addressSearch(address, function (result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                        map.panTo(coords);
+                        marker.setPosition(coords);
+                        marker.setMap(map);
+
+                        document.getElementById('latitude').value = result[0].y;
+                        document.getElementById('longitude').value = result[0].x;
+                    } else {
+                        alert("위치 검색 결과가 없습니다. 정확한 주소를 입력해 주세요.");
+                    }
+                });
+            } else {
+                alert("주소를 입력해 주세요.");
+            }
+        }
+
+        function toggleOriginalPrice() {
+            const onSaleSelect = document.getElementById('productOnSale');
+            const originalPriceInput = document.getElementById('productOriginalPrice');
+
+            if (onSaleSelect.value === 'true') {
+                originalPriceInput.disabled = false;
+                originalPriceInput.required = true;
+            } else {
+                originalPriceInput.disabled = true;
+                originalPriceInput.required = false;
+                originalPriceInput.value = '';
+            }
+        }
+
+        function validateForm() {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+
+            if (!latitude || !longitude) {
+                document.getElementById('latitude').value = 37.566535;
+                document.getElementById('longitude').value = 126.97796919999996;
+            }
+
+            return true;
+        }
+
+        // 페이지가 로드된 후 Kakao 맵 초기화
+        $(document).ready(function () {
+            kakao.maps.load(function () {
+                initKakaoMap();
+            });
+        });
+    </script>
 </body>
 
 </html>

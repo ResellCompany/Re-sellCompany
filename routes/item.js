@@ -31,36 +31,55 @@ router
 
     // 상품 등록 처리
     .post('/register', upload.single('image'), (req, res) => {
-        const { name, price, on_sale, original_price } = req.body;
+        const { name, price, on_sale, original_price, latitude, longitude } = req.body; // 위도와 경도를 req.body에서 추출
         const imagePath = req.file ? `/img/${req.file.filename}` : ''; // 업로드된 이미지 경로
         const finalOriginalPrice = original_price ? original_price : null;
         const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
         const userId = req.user ? req.user.id : null; // 로그인한 사용자의 ID
-
+    
         if (!userId) {
             return res.status(403).send("로그인이 필요합니다."); // 사용자 ID가 없으면 에러 처리
         }
-
+    
         const conn = db_connect.getConnection();
-
-        // 사용자 ID를 포함하여 상품을 데이터베이스에 저장
-        conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, userId], function (e, result) {
-            try {
-                if (e) {
-                    console.log('Insert Error:', e);
-                    throw e;
-                } else {
-                    res.redirect('/');
-                }
-            } catch (e) {
-                console.log(e);
-                res.status(500).send("Internal Server Error");
-            } finally {
+    
+        // 사용자 ID를 통해 cust 테이블에서 acc 정보 가져오기
+        conn.query('SELECT acc FROM cust WHERE id = ?', [userId], function(err, results) {
+            if (err) {
+                console.log('Select Error:', err);
                 db_connect.close(conn);
+                return res.status(500).send("Internal Server Error");
             }
+    
+            if (results.length === 0) {
+                db_connect.close(conn);
+                return res.status(404).send("사용자 정보를 찾을 수 없습니다.");
+            }
+    
+            const acc = results[0].acc; // 가져온 acc 정보
+    
+            // 사용자 ID와 acc를 포함하여 제품을 데이터베이스에 저장
+            const query = `
+                INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price, latitude, longitude, user_id, acc)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+            conn.query(query, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, latitude, longitude, userId, acc], function (e, result) {
+                try {
+                    if (e) {
+                        console.log('Insert Error:', e);
+                        throw e;
+                    } else {
+                        res.redirect('/');
+                    }
+                } catch (e) {
+                    console.log(e);
+                    res.status(500).send("Internal Server Error");
+                } finally {
+                    db_connect.close(conn);
+                }
+            });
         });
-
-
     });
+    
 
 module.exports = router;
