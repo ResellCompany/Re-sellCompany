@@ -17,7 +17,7 @@ router
     .get('/', (req, res) => {
         conn = db_connect.getConnection();
         //'SELECT * FROM cust',
-        conn.query(db_sql.cust_select, function (err, result, fields) {
+        conn.query(db_sql.cust_select_not_admin, function (err, result, fields) {
             try {
                 if (err) {
                     console.log('Select Error');

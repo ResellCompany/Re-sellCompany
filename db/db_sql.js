@@ -10,7 +10,7 @@ module.exports = {
     cart_delete: 'DELETE FROM cart WHERE id = ?',
 
 
-
+    cust_select_not_admin : `SELECT * FROM cust WHERE id != 'admin'`,
     cust_select: 'SELECT * FROM cust',
     cust_select_one: 'SELECT * FROM cust WHERE id = ?',
     cust_insert: 'INSERT INTO cust VALUES (?,?,?,?)',

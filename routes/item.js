@@ -18,47 +18,49 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router
 
+    .get('/', (req, res) => {
+        goto.go(req, res, { 'centerpage': 'item/center' });
+    })
 
-// 상품 등록 페이지 렌더링
-router.get('/register', (req, res) => {
-    goto.go(req, res, { 'centerpage': 'item/register' });
-});
+    // 상품 등록 페이지 렌더링
+    .get('/register', (req, res) => {
+        goto.go(req, res, { 'centerpage': 'item/register' });
+    })
 
-// 상품 등록 처리
-router.post('/register', upload.single('image'), (req, res) => {
-    const { name, price, on_sale, original_price } = req.body;
-    const imagePath = req.file ? `/img/${req.file.filename}` : ''; // 업로드된 이미지 경로
-    const finalOriginalPrice = original_price ? original_price : null;
-    const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
-    const userId = req.user ? req.user.id : null; // 로그인한 사용자의 ID
+    // 상품 등록 처리
+    .post('/register', upload.single('image'), (req, res) => {
+        const { name, price, on_sale, original_price } = req.body;
+        const imagePath = req.file ? `/img/${req.file.filename}` : ''; // 업로드된 이미지 경로
+        const finalOriginalPrice = original_price ? original_price : null;
+        const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
+        const userId = req.user ? req.user.id : null; // 로그인한 사용자의 ID
 
-    if (!userId) {
-        return res.status(403).send("로그인이 필요합니다."); // 사용자 ID가 없으면 에러 처리
-    }
-
-    const conn = db_connect.getConnection();
-
-    // 사용자 ID를 포함하여 상품을 데이터베이스에 저장
-    conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, userId], function (e, result) {
-        try {
-            if (e) {
-                console.log('Insert Error:', e);
-                throw e;
-            } else {
-                res.redirect('/');
-            }
-        } catch (e) {
-            console.log(e);
-            res.status(500).send("Internal Server Error");
-        } finally {
-            db_connect.close(conn);
+        if (!userId) {
+            return res.status(403).send("로그인이 필요합니다."); // 사용자 ID가 없으면 에러 처리
         }
+
+        const conn = db_connect.getConnection();
+
+        // 사용자 ID를 포함하여 상품을 데이터베이스에 저장
+        conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, userId], function (e, result) {
+            try {
+                if (e) {
+                    console.log('Insert Error:', e);
+                    throw e;
+                } else {
+                    res.redirect('/');
+                }
+            } catch (e) {
+                console.log(e);
+                res.status(500).send("Internal Server Error");
+            } finally {
+                db_connect.close(conn);
+            }
+        });
+
+
     });
-
-    
-});
-
-
 
 module.exports = router;

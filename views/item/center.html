@@ -4,13 +4,17 @@
             {% for product in products %}
             <div class="col mb-5">
                 <div class="card h-100">
+                    <!-- 제품이 세일 중인 경우 배지를 표시 -->
                     {% if product.on_sale %}
                     <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
                     {% endif %}
-                    <img class="card-img-top" src="{{ product.image_url }}" alt="..." />
+                    <!-- 제품 이미지 -->
+                    <img class="card-img-top" src="{{ product.image_url }}" alt="{{ product.name }}" />
                     <div class="card-body p-4">
                         <div class="text-center">
+                            <!-- 제품 이름 -->
                             <h5 class="fw-bolder">{{ product.name }}</h5>
+                            <!-- 세일 중인 경우 가격을 다르게 표시 -->
                             {% if product.on_sale %}
                             <span class="text-muted text-decoration-line-through">${{ product.original_price }}</span>
                             ${{ product.sale_price }}
@@ -19,10 +23,21 @@
                             {% endif %}
                         </div>
                     </div>
+                    <!-- 물건 빌리기 및 찜 하기 버튼 -->
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                         <div class="text-center">
                             <a class="btn btn-outline-dark mt-2 mb-2" href="/cart/details/{{ product.id }}">물건 빌리기</a>
                             <a class="btn btn-outline-primary mt-2" href="/cart/add/{{ product.id }}">찜 하기</a>
+
+                            <!-- 관리자용 삭제 및 수정 버튼 -->
+                            {% if loginid == 'admin' %}
+                            <div class="d-flex justify-content-center mt-3">
+                                <a class="btn btn-warning me-2" href="/item/edit/{{ product.id }}">수정</a>
+                                <form action="/item/delete/{{ product.id }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger">삭제</button>
+                                </form>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
