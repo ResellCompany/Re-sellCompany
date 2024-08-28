@@ -2,15 +2,14 @@ module.exports = {
     // 상품 테이블
     products_select:'SELECT * FROM products',
     products_insert: 'INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price) VALUES (?, ?, ?, ?, ?, ?)',
-    product_select_one: 'SELECT * FROM products WHERE id = ?',
     products_delete: 'DELETE FROM products WHERE id = ?',
     
-    products_insert: 'INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price, latitude, longitude, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    products_insert: 'INSERT INTO products (name, price, image_url, on_sale, original_price, sale_price, latitude, longitude, user_id, acc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     products_select_one: 'SELECT * FROM products WHERE id = ?',
 
    // 찜하기 (장바구니) 테이블
    cart_select: 'SELECT * FROM cart',
-   cart_select_user: 'SELECT p.id, p.name, p.price, c.added_at FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?',
+   cart_select_user: 'SELECT * FROM cart WHERE user_id = ?',
    cart_insert: 'INSERT INTO cart (user_id, product_id) VALUES (?, ?)',
    cart_delete: 'DELETE FROM cart WHERE user_id = ? AND product_id = ?',
 

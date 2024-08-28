@@ -1,0 +1,30 @@
+<body>
+    <h1>대여 물건</h1>
+    {% if items.length > 0 %}
+        <ul>
+            {% for item in items %}
+                <li>
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}" width="100" height="100">
+                    <h2>{{ item.name }}</h2>
+                    <h4>
+                        {% if item.on_sale %}
+                            <span class="text-muted text-decoration-line-through">{{ item.original_price }} 원</span>
+                            {{ item.sale_price }} 원
+                        {% else %}
+                            {{ item.price }} 원
+                        {% endif %}
+                    </h4>
+                    <!-- Updated Form for Return Action -->
+                    <form action="/cart/return" method="post">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="hidden" name="product_id" value="{{ item.id }}">
+                        <button type="submit" class="btn btn-outline-dark mt-2 mb-2">찜 하기</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>장바구니에 상품이 없습니다.</p>
+    {% endif %}
+</body>
+</html>

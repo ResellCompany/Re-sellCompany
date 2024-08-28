@@ -89,12 +89,13 @@
             }
 
         };
-
         $(document).ready(function () {
             connect();
 
             // "이 물건 빌리기" 버튼 클릭 이벤트
-            $('#borrow_btn').click(function () {
+            $('#borrow_btn').click(function (event) {
+                event.preventDefault(); // 기본 동작 막기
+
                 let myacc = `{{custinfo.acc}}`; // 사용자의 지갑 주소
                 let targetacc = `{{product.acc}}`; // 물건 등록자의 지갑 주소
                 let amount = 10; // 전송할 이더의 수 (10 이더)
@@ -107,7 +108,18 @@
                 }, function (err, transactionHash) {
                     if (!err) {
                         alert('트랜잭션이 성공적으로 전송되었습니다: ' + transactionHash);
-                        location.reload();
+
+                        // 거래 완료 후 서버에 POST 요청 보내기
+                        $.post('/cart/addcart', {
+                            user_id: '{{custinfo.id}}',  // 빌린 사람의 ID
+                            product_id: '{{product.id}}'   // 빌려준 제품의 ID
+                        }, function (data) {
+                            alert('장바구니에 추가되었습니다.');
+                            window.location.href = data.redirect;  // 서버가 보낸 리다이렉트 URL로 이동
+                        }).fail(function () {
+                            alert('장바구니 추가 실패!');
+                        });
+
                     } else {
                         console.error(err);
                         alert('트랜잭션 전송 실패!');
@@ -115,6 +127,9 @@
                 });
             });
         });
+
+
+
     </script>
 </body>
 
