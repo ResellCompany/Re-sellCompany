@@ -11,67 +11,22 @@ router.get('/', (req, res) => {
 
 // 사용자의 장바구니 조회
 router.get('/cart', (req, res) => {
-    let userid = req.query.userid || req.session.userid || req.user.id;
-    let conn = db_connect.getConnection();
+    const userId = req.query.userid || req.session.userid || req.user.id;
+    const conn = db_connect.getConnection();
 
-    conn.query(db_sql.cart_select_user, [userid], (err, result) => {
-        try {
-            if (err) {
-                console.log('Select Error');
-                throw err;
-            } else {
-                console.log(result);
-                goto.go(req, res, { 'centerpage': 'cart/cart', 'items': result });
-            }
-        } catch (err) {
-            console.log(err);
+    // 사용자의 장바구니 항목 조회
+    conn.query(db_sql.cart_select_user, [userId], (err, result) => {
+        if (err) {
+            console.error('Select Error:', err);
             res.status(500).send('Server Error');
-        } finally {
-            db_connect.close(conn);
+        } else {
+            // 장바구니 항목이 있는 경우 페이지로 이동
+            goto.go(req, res, { 'centerpage': 'cart/cart', 'items': result });
         }
+        db_connect.close(conn);
     });
 });
 
-// 장바구니에 항목 추가
-router.post('/addcart', (req, res) => {
-    let userid = req.body.userid;
-    let itemid = req.body.itemid;
-    let conn = db_connect.getConnection();
-
-    conn.query(db_sql.products_select_one, [itemid], (err, result) => {
-        try {
-            if (err) {
-                console.log('Select Error');
-                throw err;
-            } else {
-                let item = result[0];
-                let values = [userid, itemid, item.name, item.price, 1, item.price];
-
-                conn.query(db_sql.cart_insert, values, (err) => {
-                    try {
-                        if (err) {
-                            console.log('Insert Error');
-                            throw err;
-                        } else {
-                            console.log('Added to Cart');
-                            res.redirect('/cart/cart?userid=' + userid);
-                        }
-                    } catch (e) {
-                        console.log(e);
-                        res.status(500).send('Server Error');
-                    } finally {
-                        db_connect.close(conn);
-                    }
-                });
-            }
-        } catch (e) {
-            console.log(e);
-            res.status(500).send('Server Error');
-        } finally {
-            db_connect.close(conn);
-        }
-    });
-});
 
 // 제품 상세 조회
 // 물건 상세 정보 페이지 렌더링
@@ -80,7 +35,7 @@ router.get('/details/:id', (req, res) => {
     const loginid = req.query.loginid;// URL에서 loginid 가져오기
     const conn = db_connect.getConnection();
     console.log("---------------",loginid);
-    conn.query(db_sql.product_select_one, [productId], (err, rows) => {
+    conn.query(db_sql.products_select_one, [productId], (err, rows) => {
         if (err) {
             console.error('Select Error:', err);
             res.status(500).send('Internal Server Error');
@@ -119,5 +74,27 @@ router.get('/details/:id', (req, res) => {
         }
     });
 });
+
+// 장바구니에 항목 추가
+router.post('/addcart', (req, res) => {
+    const userId = req.body.user_id;   // 빌린 사람의 ID
+    const productId = req.body.product_id; // 제품 ID
+    const conn = db_connect.getConnection();
+
+    // cart 테이블에 데이터 삽입
+    conn.query(db_sql.cart_insert, [userId, productId], (err, result) => {
+        if (err) {
+            console.error('Insert Error:', err);
+            res.status(500).send('Server Error');
+        } else {
+            console.log('Added to Cart');
+            // 장바구니 추가 성공 시 /cart/cart 페이지로 리다이렉트
+            res.redirect('/cart/cart?userid=' + userId);
+        }
+        db_connect.close(conn);
+    });
+});
+
+
 
 module.exports = router;

@@ -20,11 +20,7 @@ const upload = multer({ storage: storage });
 
 router
 
-    // .get('/', (req, res) => {
-    //     goto.go(req, res, { 'centerpage':  'item/center' });
-    // })
-
-    // 상품 리스트 페이지 렌더링
+    // 홈 페이지에서 모든 아이템 표시
     .get('/', (req, res) => {
         const conn = db_connect.getConnection();
         conn.query(db_sql.products_select, (err, result) => {
@@ -32,8 +28,35 @@ router
                 console.error('Select Error:', err);
                 return res.status(500).send('Internal Server Error');
             } else {
-                console.log('Query Result:', result);
                 goto.go(req, res, { 'centerpage': 'item/item1', 'items': result });
+            }
+        });
+        db_connect.close(conn);
+    })
+
+    // 인기 아이템 페이지
+    .get('/popular', (req, res) => {
+        const conn = db_connect.getConnection();
+        conn.query(db_sql.products_select_popular, (err, result) => {
+            if (err) {
+                console.error('Select Error:', err);
+                return res.status(500).send('Internal Server Error');
+            } else {
+                goto.go(req, res, { 'centerpage': 'item/popular', 'items': result });
+            }
+        });
+        db_connect.close(conn);
+    })
+
+    // 세일 아이템 페이지
+    .get('/sales', (req, res) => {
+        const conn = db_connect.getConnection();
+        conn.query(db_sql.products_select_sales, (err, result) => {
+            if (err) {
+                console.error('Select Error:', err);
+                return res.status(500).send('Internal Server Error');
+            } else {
+                goto.go(req, res, { 'centerpage': 'item/sales', 'items': result });
             }
         });
         db_connect.close(conn);
@@ -44,19 +67,20 @@ router
         goto.go(req, res, { 'centerpage': 'item/register' });
     })
 
+    // 상품 등록 처리
     .post('/register', upload.single('image'), (req, res) => {
-        const { name, price, on_sale, original_price, latitude, longitude } = req.body; // 위도와 경도를 req.body에서 추출
-        const imagePath = req.file ? `/img/${req.file.filename}` : ''; // 업로드된 이미지 경로
+        const { name, price, on_sale, original_price, latitude, longitude } = req.body;
+        const imagePath = req.file ? `/img/${req.file.filename}` : '';
         const finalOriginalPrice = original_price ? original_price : null;
         const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
-        const userId = req.user ? req.user.id : null; // 로그인한 사용자의 ID
-    
+        const userId = req.user ? req.user.id : null;
+
         if (!userId) {
-            return res.status(403).send("로그인이 필요합니다."); // 사용자 ID가 없으면 에러 처리
+            return res.status(403).send("로그인이 필요합니다.");
         }
-    
+
         const conn = db_connect.getConnection();
-        conn.query(db_sql.products_insert_all, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, latitude, longitude, userId], (err, result) => {
+        conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, latitude, longitude, userId], (err, result) => {
             if (err) {
                 console.error('Insert Error:', err);
                 return res.status(500).send("Internal Server Error");
@@ -66,27 +90,27 @@ router
         });
         db_connect.close(conn);
     })
+
+    // 상품 상세 페이지
     .get('/detail', (req, res) => {
         let id = req.query.id;
-        console.log(id);
-        conn = db_connect.getConnection();
+        const conn = db_connect.getConnection();
 
-        conn.query(db_sql.products_select_one, id, function (err, result, fields) {
+        conn.query(db_sql.products_select_one, id, function (err, result) {
             try {
                 if (err) {
-                    console.log('Select Error  폼 태그가 비어있음 !');
                     throw err;
                 } else {
-                    console.log(result);
                     goto.go(req, res, { 'centerpage': 'item/detail', 'item': result[0] });
                 }
             } catch (e) {
-                console.log(e);
+                console.error(e);
             } finally {
                 db_connect.close(conn);
             }
         });
     })
+
     // 상품 정보 업데이트
     .post('/updateimpl', (req, res) => {
         let id = req.body.id;
@@ -95,7 +119,7 @@ router
         let sale_price = req.body.sale_price;
         let original_price = req.body.original_price;
         let image_url = req.body.image_url;
-        let on_sale = req.body.on_sale === 'on' ? 1 : 0; // Checkbox 처리
+        let on_sale = req.body.on_sale === 'on' ? 1 : 0;
         let latitude = req.body.latitude;
         let longitude = req.body.longitude;
         let user_id = req.body.user_id;
@@ -104,20 +128,17 @@ router
 
         let sql = 'UPDATE products SET name = ?, price = ?, sale_price = ?, original_price = ?, image_url = ?, on_sale = ?, latitude = ?, longitude = ?, user_id = ? WHERE id = ?';
 
-        let conn = db_connect.getConnection();
+        const conn = db_connect.getConnection();
 
         conn.query(sql, values, (err, result) => {
             try {
                 if (err) {
-                    console.log('update Error');
                     throw err;
                 } else {
-                    console.log('update OK!');
-                    res.redirect('/products/detail?id=' + id); // 수정된 URL로 리디렉션
+                    res.redirect('/detail?id=' + id);
                 }
             } catch (err) {
-                goto.go(req, res, { 'centerpage': 'products/detailfail' }); // 실패 페이지
-                console.log(err);
+                goto.go(req, res, { 'centerpage': 'item/detailfail' });
             } finally {
                 db_connect.close(conn);
             }
@@ -126,32 +147,26 @@ router
 
     // 상품 삭제
     .get('/deleteimpl', (req, res) => {
-        let id = req.query.id; // GET 요청에서는 req.query 사용
+        let id = req.query.id;
         let values = [id];
 
         let sql = 'DELETE FROM products WHERE id = ?';
 
-        let conn = db_connect.getConnection();
+        const conn = db_connect.getConnection();
 
         conn.query(sql, values, (err, result) => {
             try {
                 if (err) {
-                    console.log('delete Error');
                     throw err;
                 } else {
-                    console.log('delete OK!');
-                    res.redirect('/products/'); // 수정된 URL로 리디렉션
+                    res.redirect('/');
                 }
             } catch (err) {
-                goto.go(req, res, { 'centerpage': 'products/detailfail' }); // 실패 페이지
-                console.log(err);
+                goto.go(req, res, { 'centerpage': 'item/detailfail' });
             } finally {
                 db_connect.close(conn);
             }
         });
     });
-    
-
-
 
 module.exports = router;

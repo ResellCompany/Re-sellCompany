@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>찜 목록 - Share and Borrow</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+
+<body>
+    <!-- Navigation -->
+    {% include "navbar.html" %}
+
+    <!-- Header -->
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">찜 목록</h1>
+                <p class="lead fw-normal text-white-50 mb-0">찜한 상품들을 확인하세요.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Wish List -->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row">
+                {% for item in items %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card">
+                        <img class="card-img-top" src="{{item.image_url}}" alt="{{item.name}}" />
+                        <div class="card-body">
+                            <h5 class="card-title">{{item.name}}</h5>
+                            <p class="card-text">{{item.price | number_format(2)}}</p>
+                            <button class="btn btn-outline-danger remove-wish" data-product-id="{{item.id}}">찜 해제</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    {% include "footer.html" %}
+
+    <script>
+    document.querySelectorAll('.remove-wish').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var productId = this.getAttribute('data-product-id');
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/wish/remove', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('userid={{loginid}}&productid=' + productId);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('찜 목록에서 제거되었습니다.');
+                    location.reload();
+                } else {
+                    alert('찜 목록에서 제거에 실패했습니다.');
+                }
+            };
+        });
+    });
+    </script>
+</body>
+
+</html>

@@ -17,24 +17,27 @@ const db_sql = require('./db/db_sql');
 
 // 유틸리티 및 라우터
 const goto = require('./util/goto');
-const item = require('./routes/item');
-const cart = require('./routes/cart');
+const itemRouter = require('./routes/item');
+const cartRouter = require('./routes/cart');
+const adminRouter = require('./routes/admin');
+const custRouter = require('./routes/cust');
+
 // Nunjucks 템플릿 엔진 설정
 nunjucks.configure('views', {
     express: app,
+    autoescape: true,  // XSS 공격 방지
 });
-
 app.set('view engine', 'html');
+
+// 미들웨어 설정
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use('/css', express.static(path.join(__dirname, 'css')));
-
-// CORS 설정
 app.use(cors());
 
 // 세션 설정
 app.use(session({
-    secret: "secret key",
+    secret: process.env.SESSION_SECRET || "default_secret_key",
     resave: false,
     saveUninitialized: true,
     store: new MemoryStore({ checkPeriod: 86400000 }) // 24시간
@@ -45,13 +48,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Passport 설정: 사용자 직렬화 및 역직렬화
-passport.serializeUser(function (req, user, done) {
-    console.log('serializeUser:', user);
+passport.serializeUser((user, done) => {
     done(null, user);
 });
 
-passport.deserializeUser(function (req, user, done) {
-    console.log('Login User:', user.name, user.id);
+passport.deserializeUser((user, done) => {
     done(null, user);
 });
 
@@ -59,102 +60,101 @@ passport.deserializeUser(function (req, user, done) {
 passport.use(new LocalStrategy({
     usernameField: "id",
     passwordField: "pwd",
-}, function (userid, password, done) {
-    console.log('Attempting login with ID:', userid);
-
+}, (userid, password, done) => {
     const conn = db_connect.getConnection();
     conn.query(db_sql.cust_select_one, [userid], (err, row) => {
+        db_connect.close(conn);
         if (err) return done(err);
-
         if (!row[0] || row[0]['pwd'] !== password) {
             return done(null, false, { message: "Login Fail" });
         }
-
         const user = { id: userid, name: row[0]['name'], acc: row[0]['acc'] };
         return done(null, user);
     });
 }));
 
-// 로그인 라우터 설정
+// 로그인 및 로그아웃 라우트
 app.post('/login', passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/loginerror",
 }));
 
-app.get('/loginerror', (req, res) => {
-    goto.go(req, res, { centerpage: 'loginerror' });
-});
+app.get('/loginerror', (req, res) => goto.go(req, res, { centerpage: 'loginerror' }));
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
-})
+});
 
-// 메인 페이지 라우터
+// 메인 페이지 라우트
 app.get('/', (req, res) => {
     const conn = db_connect.getConnection();
     conn.query(db_sql.products_select, (e, result) => {
+        db_connect.close(conn);
         if (e) {
             console.log('Select Error:', e);
             return res.status(500).send("Internal Server Error");
         }
         goto.go(req, res, { products: result });
     });
+})
+// Popular Items 라우터
+app.get('/item/popular', (req, res) => {
+    const conn = db_connect.getConnection();
+    conn.query(db_sql.products_select_popular, (e, result) => {
+        if (e) {
+            console.log('Select Error:', e);
+            return res.status(500).send("Internal Server Error");
+        }
+        goto.go(req, res, { products: result, centerpage: 'popular' });
+    });
 });
 
-// 기타 페이지 라우터
+// Sales Items 라우터
+app.get('/item/sales', (req, res) => {
+    const conn = db_connect.getConnection();
+    conn.query(db_sql.products_select_sales, (e, result) => {
+        if (e) {
+            console.log('Select Error:', e);
+            return res.status(500).send("Internal Server Error");
+        }
+        goto.go(req, res, { products: result, centerpage: 'sales' });
+    });
+});
+
+
+// 기타 페이지 라우트
 app.get('/login', (req, res) => goto.go(req, res, { centerpage: 'login' }));
 app.get('/register', (req, res) => goto.go(req, res, { centerpage: 'register' }));
 app.get('/about', (req, res) => goto.go(req, res, { centerpage: 'about' }));
 
-// 회원가입 처리 라우터
+// 회원가입 처리 라우트
 app.post('/registerimpl', (req, res) => {
-    // 요청으로부터 필요한 데이터를 추출
-    let id = req.body.id;
-    let pwd = req.body.pwd;
-    let name = req.body.name;
-    let acc = req.body.acc;
+    const { id, pwd, name, acc } = req.body;
 
-    // 입력받은 데이터 확인을 위한 로그 출력
-    console.log(`${id} ${pwd} ${name} ${acc}`);
+    console.log(`Registering user: ${id}, ${name}, ${acc}`);
 
-    // 데이터베이스 연결
     const conn = db_connect.getConnection();
-    let values = [id, pwd, name, acc];
+    const values = [id, pwd, name, acc];
 
-    // 쿼리 실행
-    conn.query(db_sql.cust_insert, values, (e, result, fields) => {
-        try {
-            if (e) {
-                console.log('Insert Error');
-                throw e; // 에러 발생 시 예외를 던져 catch 블록으로 이동
-            } else {
-                console.log('Insert OK!');
-                // 회원가입 성공 페이지로 이동
-                return goto.go(req, res, { centerpage: 'registerok' });
-            }
-        } catch (e) {
-            // 에러 발생 시 실패 페이지로 이동
-            console.log(e);
+    conn.query(db_sql.cust_insert, values, (e) => {
+        db_connect.close(conn);
+        if (e) {
+            console.log('Insert Error:', e);
             return goto.go(req, res, { centerpage: 'registerfail' });
-        } finally {
-            // 데이터베이스 연결 닫기
-            db_connect.close(conn);
+        } else {
+            console.log('Insert OK!');
+            return goto.go(req, res, { centerpage: 'registerok' });
         }
     });
 });
 
-// 아이템 관련 라우터
-app.use('/item', item);
-app.use('/cart', cart);
-app.use('/products', item);
+// 라우터 설정
+app.use('/item', itemRouter);
+app.use('/cart', cartRouter);
+app.use('/products', itemRouter);
+app.use('/admin', adminRouter);
+app.use('/cust', custRouter);
 
-
-//관리자 모드 
-const admin = require('./routes/admin');
-app.use('/admin', admin)
-// 박주민_회원정보변경 (cust)
-const cust = require('./routes/cust');
-app.use('/cust', cust);
 // 서버 실행
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
