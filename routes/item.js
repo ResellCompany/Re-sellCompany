@@ -79,14 +79,14 @@ router
         }
 
         const conn = db_connect.getConnection();
-        conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, latitude, longitude, userId], (err, result) => {
+        conn.query(db_sql.cust_select_one, [userId], (err, result) => {
             if (err) {
                 console.error('Select Error:', err);
                 db_connect.close(conn);
                 return res.status(500).send("Internal Server Error");
             }
     
-            const acc = custResult[0].acc; // custResult로부터 acc 값 가져오기
+            const acc = result[0].acc; // custResult로부터 acc 값 가져오기
     
             // 제품 삽입 쿼리
             conn.query(db_sql.products_insert, [name, price, imagePath, on_sale === 'true', finalOriginalPrice, salePrice, latitude, longitude, userId, acc], (err, result) => {
