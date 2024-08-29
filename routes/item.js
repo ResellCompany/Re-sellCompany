@@ -72,7 +72,7 @@ router
         const { name, price, on_sale, original_price, latitude, longitude } = req.body;
         const imagePath = req.file ? `/img/${req.file.filename}` : '';
         const finalOriginalPrice = original_price ? original_price : null;
-        const salePrice = on_sale === 'true' ? finalOriginalPrice : null;
+        const salePrice = on_sale === 'true' ? price : null;
         const userId = req.user ? req.user.id : null;
         if (!userId) {
             return res.status(403).send("로그인이 필요합니다.");

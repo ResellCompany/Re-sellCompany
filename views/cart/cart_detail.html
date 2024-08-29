@@ -84,6 +84,7 @@
             }
 
         };
+
         $(document).ready(function () {
             connect();
 
@@ -103,7 +104,6 @@
                 }, function (err, transactionHash) {
                     if (!err) {
                         alert('트랜잭션이 성공적으로 전송되었습니다: ' + transactionHash);
-
                         // 거래 완료 후 서버에 POST 요청 보내기
                         $.post('/cart/addcart', {
                             user_id: '{{custinfo.id}}',  // 빌린 사람의 ID
@@ -114,7 +114,6 @@
                         }).fail(function () {
                             alert('장바구니 추가 실패!');
                         });
-
                     } else {
                         console.error(err);
                         alert('트랜잭션 전송 실패!');
@@ -122,9 +121,6 @@
                 });
             });
         });
-
-
-
     </script>
 </body>
 
