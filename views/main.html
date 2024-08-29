@@ -100,17 +100,12 @@
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                             data-toggle="dropdown" aria-expanded="false">Browse</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/item/">All Items</a></li>
+                            <li><a class="dropdown-item" href="/">All Items</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="/item/popular">Popular Items</a></li>
                             <li><a class="dropdown-item" href="/item/sales">Sales Items</a></li> <!-- 추가된 항목 -->
                         </ul>
                     </li>
-                    {% if loginid and loginid != 'admin' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/useritem/cart">찜한 상품</a>
-                    </li>
-                    {% endif %}
                     {% if loginid == 'admin' %}
                     <li class="nav-item">
                         <a class="nav-link" href="/cust">Cust Mgt</a>

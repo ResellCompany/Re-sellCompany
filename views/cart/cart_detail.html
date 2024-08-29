@@ -19,10 +19,10 @@
                 <p class="mt-4">{{ product.description }}</p>
                 <h4>
                     {% if product.on_sale %}
-                    <span class="text-muted text-decoration-line-through">${{ product.original_price }}</span>
-                    ${{ product.sale_price }}
+                    <span class="text-muted text-decoration-line-through">{{ product.original_price }}ETH</span>
+                    {{ product.sale_price }}ETH
                     {% else %}
-                    ${{ product.price }}
+                    {{ product.price }}ETH
                     {% endif %}
                 </h4>
                 <!-- "이 물건 빌리기" 버튼 -->

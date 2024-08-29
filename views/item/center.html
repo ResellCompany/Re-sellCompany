@@ -29,9 +29,9 @@
                         <tr>
                             <td><{{p.id}}/td>
                             <td>{{p.name}}</td>
-                            <td>${{p.price}}</td>
-                            <td>${{p.sale_price if p.sale_price else 'N/A'}}</td>
-                            <td>${{p.original_price if p.original_price else 'N/A'}}</td>
+                            <td>{{p.price}}ETH</td>
+                            <td>{{p.sale_price if p.sale_price else 'N/A'}}ETH</td>
+                            <td>{{p.original_price if p.original_price else 'N/A'}}ETH</td>
                             <td>{{p.image_url}}</td>
                             <td>{% if p.on_sale %} Yes {% else %} No {% endif %}</td>
                         </tr>

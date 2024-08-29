@@ -31,9 +31,9 @@
                         <tr>  
                             <td><a href ='/item/detail?id={{item.id}}'>{{ item.id }}</a></td>
                             <td>{{ item.name }}</td>
-                            <td>${{ item.price }}</td>
-                            <td>${{ item.sale_price if item.sale_price is not none else 'N/A' }}</td>
-                            <td>${{ item.original_price if item.original_price is not none else 'N/A' }}</td>
+                            <td>{{ item.price }}ETH</td>
+                            <td>{{ item.sale_price if item.sale_price is not none else 'N/A' }}ETH</td>
+                            <td>{{ item.original_price if item.original_price is not none else 'N/A' }}ETH</td>
                             <td>
                                 {% if item.image_url %}
                                     <img src="{{ item.image_url }}" alt="Image" style="width:100px;height:auto;">

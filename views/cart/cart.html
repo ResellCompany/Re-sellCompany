@@ -8,17 +8,17 @@
                     <h2>{{ item.name }}</h2>
                     <h4>
                         {% if item.on_sale %}
-                            <span class="text-muted text-decoration-line-through">{{ item.original_price }} 원</span>
-                            {{ item.sale_price }} 원
+                            <span class="text-muted text-decoration-line-through">{{ item.original_price }} ETH</span>
+                            {{ item.sale_price }} ETH
                         {% else %}
-                            {{ item.price }} 원
+                            {{ item.price }} ETH
                         {% endif %}
                     </h4>
                     <!-- Updated Form for Return Action -->
                     <form action="/cart/return" method="post">
                         <input type="hidden" name="user_id" value="{{ user.id }}">
                         <input type="hidden" name="product_id" value="{{ item.id }}">
-                        <button type="submit" class="btn btn-outline-dark mt-2 mb-2">찜 하기</button>
+                        <button type="submit" class="btn btn-outline-dark mt-2 mb-2">반납하기</button>
                     </form>
                 </li>
             {% endfor %}
